@@ -21,27 +21,29 @@ public class Population {
         try {
             Map<String, Integer> totalPopByDept;
             Map<String, Integer> maxPopByDept;
-            Map<Integer, Set<String>> minPopAllDept = new HashMap<Integer, Set<String>>();
+            Map<Integer, Set<String>> minPopAllDept;//= new HashMap<Integer, Set<String>>();
             LinesStreamProcess linesStream = new LinesStreamProcess();
 
             String resourcepath =   linesStream.getResourcePath(args[0]);
 
             //System.out.println(resourcepath);
             List<String> lines = Files.readAllLines(Paths.get(resourcepath));
+            //System.out.println(lines.toString());
             String header = lines.remove(0);
 
-            totalPopByDept = linesStream.getTotalPopulationByDept(lines);
-            maxPopByDept = linesStream.getMaxPopulationByDept(lines);
-            minPopAllDept = linesStream.getMinPopulationForAllDepts(lines);
+            List<PopObj> objs =  linesStream.getAllPopObjs(lines);
+            totalPopByDept = linesStream.getTotalPopulationByDept(objs);
+            maxPopByDept = linesStream.getMaxPopulationByDept(objs);
+            minPopAllDept = linesStream.getMinPopulationForAllDepts(objs);
 
             Integer minPopulation = Collections.min(minPopAllDept.keySet());
-
-            maxPopByDept.entrySet().stream().forEach( e -> {
-                String s = e.getKey();
-                Integer mp = e.getValue();
-                Integer tp = totalPopByDept.get(s);
-                System.out.println("Department " + s + ", Total Population " +  tp.toString() + ", Max Population " + mp.toString());
-            });
+            Object[] strArr =  maxPopByDept.keySet().toArray();
+            Arrays.sort(strArr);
+            for (Object s : strArr) {
+                Integer mp = maxPopByDept.get(s.toString());
+                Integer tp = totalPopByDept.get(s.toString());
+                System.out.println("Department " + s.toString() + ", Total Population " +  tp.toString() + ", Max Population " + mp.toString());
+            };
             System.out.println("\n" + minPopAllDept.get(minPopulation).toString() + " found with  Mininum Population " +  minPopulation.toString() + " in all Departments");
         } catch (Exception e) {
             throw new RuntimeException(e);
