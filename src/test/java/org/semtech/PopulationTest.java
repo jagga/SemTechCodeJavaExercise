@@ -11,8 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 class PopulationTest {
-    private static String TestInputFile = "population_2019_500";
-    private List<String> lines;
+    private static String testInputFile = "population_2019_500";
 
     private static LinesStreamProcess lineStrmObj = new LinesStreamProcess();
     //private static String[] lines;
@@ -25,6 +24,18 @@ class PopulationTest {
     private static Map<String, Integer> totalPopByDeptT;
     private static Map<String, Integer> maxPopByDeptT;
     private static Map<Integer, Set<String>> minPopAllDeptT; // = new HashMap<Integer, Set<String>>();
+
+    //System.out.println(resourcepath);
+    List<String> lines ; //= null;
+    public List<String> getPopObjects() {
+        try {
+            lines = Files.readAllLines(Paths.get(testInputFile));
+            //System.out.println(lines.toString());
+            String header = lines.remove(0);
+        } catch (Exception e) {
+        }
+        return lines;
+    }
 
     public String getTestResourcePath(String file) {
         String resourcepath = this.getClass().getClassLoader().getResource(file).getPath().toString();
@@ -44,19 +55,19 @@ class PopulationTest {
             System.out.println(resourcepath);
             lines = Files.readAllLines(Paths.get(resourcepath));
             String header = lines.remove(0);
-            lineStrmObj.setLines(lines);
             return lines;
         } catch (Exception e) {
             lines = Arrays.asList(";;;");
-            return lines;
+            return null;
         }
     }
 
     void getMaxPopulationResults() {
-        setUpLines("population_2019.csv", "main");
-        totalPopByDept = lineStrmObj.getTotalPopulationByDept(lines);
-        maxPopByDept = lineStrmObj.getMaxPopulationByDept(lines);
-        minPopAllDept = lineStrmObj.getMinPopulationForAllDepts(lines);
+        List<String> lines = setUpLines("population_2019.csv", "main");
+        List<PopObj> objs =  lineStrmObj.getAllPopObjs(lines);
+        totalPopByDept = lineStrmObj.getTotalPopulationByDept(objs);
+        maxPopByDept = lineStrmObj.getMaxPopulationByDept(objs);
+        minPopAllDept = lineStrmObj.getMinPopulationForAllDepts(objs);
     }
 
     void setup() {
@@ -71,7 +82,8 @@ class PopulationTest {
     void getMaxPopulationByDeptTest() {
         getMaxPopulationResults();
         lines = setUpLines("maxpopbydept.csv","test");
-        maxPopByDeptT = lineStrmObj.getMaxPopulationByDept(lines);
+        List<PopObj> objs =  lineStrmObj.getAllPopObjs(lines);
+        maxPopByDeptT = lineStrmObj.getMaxPopulationByDept(objs);
         assertEquals(maxPopByDept.get("MANCHE"), maxPopByDeptT.get("MANCHE"));
         assertEquals(maxPopByDept.get("GIRONDE"), maxPopByDeptT.get("GIRONDE"));
         assertEquals(maxPopByDept.get("COTE-D'OR"), maxPopByDeptT.get("COTE-D'OR"));
@@ -82,8 +94,8 @@ class PopulationTest {
     void getTotalPopulationByDeptTest() {
         getMaxPopulationResults();
         lines = setUpLines("totpopbydept.csv","test");
-
-        totalPopByDeptT = lineStrmObj.getTotalPopulationByDept(lines);
+        List<PopObj> objs =  lineStrmObj.getAllPopObjs(lines);
+        totalPopByDeptT = lineStrmObj.getTotalPopulationByDept(objs);
 
         assertEquals(totalPopByDept.get("MANCHE"), totalPopByDeptT.get("MANCHE"));  //        14	4811
         assertEquals(totalPopByDept.get("GIRONDE"), totalPopByDeptT.get("GIRONDE"));  //        15	1316
@@ -99,8 +111,8 @@ class PopulationTest {
     void getMinPopulationForAllDepts() {
         lines = setUpLines("minpopbyalldept.csv","test");
         Integer minExpectedPop = 19;
-
-        minPopAllDeptT = lineStrmObj.getMinPopulationForAllDepts(lines);
+        List<PopObj> objs =  lineStrmObj.getAllPopObjs(lines);
+        minPopAllDeptT = lineStrmObj.getMinPopulationForAllDepts(objs);
         Integer minPopulation = Collections.min(minPopAllDeptT.keySet());
         assertEquals(minPopulation.toString(), minExpectedPop.toString());
     }
@@ -108,6 +120,5 @@ class PopulationTest {
     public static void main(String[] argv) {
         PopulationTest  poptest = new  PopulationTest();
     }
-
 
 }
