@@ -10,7 +10,6 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-
 class PopulationTest {
     private static String TestInputFile = "population_2019_500";
     private List<String> lines;
